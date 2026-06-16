@@ -1,0 +1,66 @@
+@import url("https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,700,500,400&f[]=manrope@700,600,500,400&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: "Manrope", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #F7F6FB;
+  color: #2A2540;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 98%;
+    --foreground: 0 0% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 4%;
+    --primary: 263 90% 59%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 270 100% 96%;
+    --accent-foreground: 270 60% 30%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 91%;
+    --input: 0 0% 91%;
+    --ring: 263 90% 59%;
+    --chart-1: 263 90% 59%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 90% 55%;
+    --chart-4: 200 80% 50%;
+    --chart-5: 340 75% 55%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  h1, h2, h3, h4, h5 {
+    font-family: "Cabinet Grotesk", "Manrope", system-ui, sans-serif;
+    letter-spacing: -0.015em;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #a3a3a3; }
+
+@layer base {
+  [data-debug-wrapper="true"] { display: contents !important; }
+}
