@@ -271,54 +271,100 @@ const Stage1 = ({ precioDiesel, setPrecioDiesel, vehicles, setVehicles, onBack, 
       </div>
 
       <div className="mb-3">
-        <div className="grid grid-cols-[1.4fr_1fr_1fr_42px] gap-2.5 pb-2 px-1 text-[11px] uppercase tracking-wider font-bold text-neutral-500">
+        {/* Header de columnas: solo visible en sm+ */}
+        <div className="hidden sm:grid grid-cols-[1.4fr_1fr_1fr_42px] gap-2.5 pb-2 px-1 text-[11px] uppercase tracking-wider font-bold text-neutral-500">
           <div>Categoría</div>
           <div>Consumo/mes (gl)</div>
           <div>N° unidades</div>
           <div />
         </div>
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-3 sm:gap-2.5">
           {vehicles.map((v, idx) => (
-            <div key={idx} className="grid grid-cols-[1.4fr_1fr_1fr_42px] gap-2.5 items-center animate-slide-in" data-testid={`vehicle-row-${idx}`}>
-              <select
-                value={v.categoryId}
-                onChange={(e) => updateRow(idx, { categoryId: e.target.value })}
-                data-testid={`vehicle-cat-${idx}`}
-                className="rounded-xl border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-4 focus:ring-brand-50 focus:border-brand"
-              >
-                {VEHICLE_CATEGORIES.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.id} · {c.label}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                value={v.consumo}
-                onChange={(e) => updateRow(idx, { consumo: e.target.value })}
-                placeholder="ej. 350"
-                data-testid={`vehicle-consumo-${idx}`}
-                className="rounded-xl border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-4 focus:ring-brand-50 focus:border-brand"
-              />
-              <input
-                type="number"
-                min="0"
-                step="1"
-                value={v.unidades}
-                onChange={(e) => updateRow(idx, { unidades: e.target.value })}
-                placeholder="ej. 4"
-                data-testid={`vehicle-unidades-${idx}`}
-                className="rounded-xl border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-4 focus:ring-brand-50 focus:border-brand"
-              />
+            <div
+              key={idx}
+              className="rounded-2xl border-[1.5px] border-neutral-200 bg-white p-3 sm:p-0 sm:border-0 sm:bg-transparent sm:rounded-none sm:grid sm:grid-cols-[1.4fr_1fr_1fr_42px] sm:gap-2.5 sm:items-center animate-slide-in"
+              data-testid={`vehicle-row-${idx}`}
+            >
+              {/* Móvil: header con número de fila + botón eliminar */}
+              <div className="flex items-center justify-between mb-2 sm:hidden">
+                <span className="text-[11px] uppercase tracking-wider font-bold text-neutral-500">
+                  Vehículo #{idx + 1}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeRow(idx)}
+                  disabled={vehicles.length === 1}
+                  aria-label="Eliminar fila"
+                  data-testid={`vehicle-remove-mobile-${idx}`}
+                  className="inline-flex items-center gap-1 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 disabled:opacity-40 disabled:cursor-not-allowed px-2.5 py-1.5 text-xs font-semibold transition-all"
+                >
+                  <Trash2 size={14} /> Quitar
+                </button>
+              </div>
+
+              {/* Categoría */}
+              <div className="sm:contents">
+                <label className="block text-[11px] uppercase tracking-wider font-bold text-neutral-500 mb-1 sm:hidden">
+                  Categoría
+                </label>
+                <select
+                  value={v.categoryId}
+                  onChange={(e) => updateRow(idx, { categoryId: e.target.value })}
+                  data-testid={`vehicle-cat-${idx}`}
+                  className="w-full rounded-xl border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-4 focus:ring-brand-50 focus:border-brand"
+                >
+                  {VEHICLE_CATEGORIES.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.id} · {c.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Consumo */}
+              <div className="mt-2.5 sm:mt-0 sm:contents">
+                <label className="block text-[11px] uppercase tracking-wider font-bold text-neutral-500 mb-1 sm:hidden">
+                  Consumo/mes (gl)
+                </label>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min="0"
+                  step="1"
+                  value={v.consumo}
+                  onChange={(e) => updateRow(idx, { consumo: e.target.value })}
+                  placeholder="ej. 350"
+                  data-testid={`vehicle-consumo-${idx}`}
+                  className="w-full rounded-xl border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-4 focus:ring-brand-50 focus:border-brand"
+                />
+              </div>
+
+              {/* Unidades */}
+              <div className="mt-2.5 sm:mt-0 sm:contents">
+                <label className="block text-[11px] uppercase tracking-wider font-bold text-neutral-500 mb-1 sm:hidden">
+                  N° unidades
+                </label>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min="0"
+                  step="1"
+                  value={v.unidades}
+                  onChange={(e) => updateRow(idx, { unidades: e.target.value })}
+                  placeholder="ej. 4"
+                  data-testid={`vehicle-unidades-${idx}`}
+                  className="w-full rounded-xl border-[1.5px] border-neutral-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-4 focus:ring-brand-50 focus:border-brand"
+                />
+              </div>
+
+              {/* Botón eliminar - solo desktop */}
               <button
                 type="button"
                 onClick={() => removeRow(idx)}
                 disabled={vehicles.length === 1}
                 aria-label="Eliminar fila"
                 data-testid={`vehicle-remove-${idx}`}
-                className="h-11 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center transition-all"
+                className="hidden sm:flex h-11 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 disabled:opacity-40 disabled:cursor-not-allowed items-center justify-center transition-all"
               >
                 <Trash2 size={16} />
               </button>
