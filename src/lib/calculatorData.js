@@ -21,7 +21,6 @@ export const ELIGIBILITY_QUESTIONS = [
       { value: "regional", text: "Transporte de personas — ámbito regional", icon: "🚐" },
       { value: "provincial", text: "Transporte de personas — ámbito provincial", icon: "🚏" },
       { value: "mercancias", text: "Transporte público de mercancías (carga)", icon: "📦" },
-      { value: "otros", text: "Otros (especificar)", icon: "✍️" },
     ],
   },
   {
