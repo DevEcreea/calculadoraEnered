@@ -543,14 +543,8 @@ export default function Calculator() {
 
     try {
       const { data } = await axios.post(`${apiUrl}/api/calculations`, payload);
-      const calcId = data?.calc_id || "";
-      if (califica) {
-        window.location.href = `${plataforma}/registro-subsidio?calc_id=${calcId}`;
-      } else {
-        window.location.href = `${plataforma}/no-califica?calc_id=${calcId}`;
-      }
+      window.location.href = `${plataforma}/registro-subsidio?calc_id=${data.calc_id}`;
     } catch (e) {
-      console.error("Error guardando cálculo", e);
       alert("No pudimos guardar tu cálculo. Inténtalo de nuevo.");
       setSubmitting(false);
     }
