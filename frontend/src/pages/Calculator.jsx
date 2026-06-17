@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import axios from "axios";
 import {
   ArrowRight,
   ArrowLeft,
@@ -11,6 +12,7 @@ import {
   MessageCircle,
   Info,
   Rocket,
+  Loader2,
 } from "lucide-react";
 import {
   ELIGIBILITY_QUESTIONS,
@@ -362,7 +364,7 @@ const Stage1 = ({ precioDiesel, setPrecioDiesel, vehicles, setVehicles, onBack, 
 };
 
 // ---------- Stage 2: Result ----------
-const Stage2 = ({ result, precioDiesel, onBack }) => {
+const Stage2 = ({ result, precioDiesel, vehicles, onBack, onEmpezarRegistro, submitting }) => {
   if (!result) return null;
   const { totalSubsidy, totalGallonsRecognized, totalExpense, coverage, details } = result;
 
@@ -459,10 +461,20 @@ const Stage2 = ({ result, precioDiesel, onBack }) => {
         </p>
         <button
           type="button"
+          onClick={onEmpezarRegistro}
+          disabled={submitting}
           data-testid="start-registration-btn"
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand to-brand-500 px-6 py-3.5 text-sm font-bold text-white shadow-[0_4px_16px_rgba(128,57,244,0.25)] hover:shadow-[0_6px_22px_rgba(128,57,244,0.35)] hover:-translate-y-0.5 transition-all"
+          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand to-brand-500 px-6 py-3.5 text-sm font-bold text-white shadow-[0_4px_16px_rgba(128,57,244,0.25)] hover:shadow-[0_6px_22px_rgba(128,57,244,0.35)] hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
         >
-          <Rocket size={16} /> Empezar mi registro
+          {submitting ? (
+            <>
+              <Loader2 size={16} className="animate-spin" /> Guardando...
+            </>
+          ) : (
+            <>
+              <Rocket size={16} /> Empezar mi registro
+            </>
+          )}
         </button>
       </div>
 
@@ -490,6 +502,7 @@ export default function Calculator() {
   const [answers, setAnswers] = useState({});
   const [ambitoOtro, setAmbitoOtro] = useState("");
   const [verdict, setVerdict] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const [precioDiesel, setPrecioDiesel] = useState("16.50");
   const [vehicles, setVehicles] = useState([{ categoryId: "M2", consumo: "", unidades: "" }]);
@@ -503,6 +516,44 @@ export default function Calculator() {
     const v = evaluateEligibility(answers, ambitoOtro);
     setVerdict(v);
     setStage(v.ok ? "stage1" : "stageNo");
+  };
+
+  const handleEmpezarRegistro = async () => {
+    if (!result || submitting) return;
+    setSubmitting(true);
+    const califica = true;
+    const apiUrl = process.env.REACT_APP_API_URL;
+    const plataforma = process.env.REACT_APP_PLATAFORMA_URL;
+
+    const payload = {
+      califica,
+      categorias: vehicles.map((v) => ({
+        code: v.categoryId,
+        cantidad: Number(v.unidades),
+        galones_mensuales: Number(v.consumo),
+      })),
+      total_galones_mensuales: vehicles.reduce(
+        (a, v) => a + Number(v.unidades) * Number(v.consumo),
+        0
+      ),
+      subsidio_estimado: result.totalSubsidy,
+      detalle: result,
+      canal_origen: "calculadora",
+    };
+
+    try {
+      const { data } = await axios.post(`${apiUrl}/api/calculations`, payload);
+      const calcId = data?.calc_id || "";
+      if (califica) {
+        window.location.href = `${plataforma}/registro-subsidio?calc_id=${calcId}`;
+      } else {
+        window.location.href = `${plataforma}/no-califica?calc_id=${calcId}`;
+      }
+    } catch (e) {
+      console.error("Error guardando cálculo", e);
+      alert("No pudimos guardar tu cálculo. Inténtalo de nuevo.");
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -537,7 +588,10 @@ export default function Calculator() {
           <Stage2
             result={result}
             precioDiesel={Number(precioDiesel) || 0}
+            vehicles={vehicles}
             onBack={() => setStage("stage1")}
+            onEmpezarRegistro={handleEmpezarRegistro}
+            submitting={submitting}
           />
         )}
       </div>
