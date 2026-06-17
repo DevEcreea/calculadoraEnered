@@ -13,8 +13,11 @@ yarn-error.log*
 .vscode/
 .env
 .env.*
+!.env.example
 *.env
 credentials.json
 *.pem
 *.key
 .credentials
+# Local supervisor-only mirror (not part of the actual repo structure)
+/frontend/
