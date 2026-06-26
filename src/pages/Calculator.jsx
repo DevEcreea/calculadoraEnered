@@ -76,7 +76,7 @@ const Header = ({ timeLeft }) => {
           <img
             src="/assets/robot.png"
             alt="Robot"
-            className="h-24 sm:h-28 w-auto object-contain mix-blend-multiply drop-shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
+            className="h-24 sm:h-28 w-auto object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
           />
           <div className="text-center sm:text-left flex-1">
             <h1 className="text-white font-extrabold font-cabinet text-xl sm:text-2xl md:text-3xl leading-tight mb-1" data-testid="hero-title">
