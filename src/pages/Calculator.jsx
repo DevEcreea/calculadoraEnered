@@ -72,12 +72,24 @@ const Header = ({ timeLeft }) => {
           </div>
         </div>
         
-        <h1 className="text-white font-extrabold font-cabinet text-2xl sm:text-3xl mb-2 leading-tight" data-testid="hero-title">
-          Calculadora de devolución · DU 004-2026
-        </h1>
-        <p className="text-white/85 text-sm sm:text-base max-w-xl">
-          Estima cuánto te devuelve el Estado por el diésel B5/B20 que consume tu flota – <strong className="font-extrabold text-white">antes de que cierre la ventana.</strong>
-        </p>
+        <div className="flex flex-col sm:flex-row items-center gap-6 mt-6">
+          <img
+            src="/assets/robot.png"
+            alt="Robot"
+            className="h-24 sm:h-28 w-auto object-contain mix-blend-multiply drop-shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
+          />
+          <div className="text-center sm:text-left flex-1">
+            <h1 className="text-white font-extrabold font-cabinet text-xl sm:text-2xl md:text-3xl leading-tight mb-1" data-testid="hero-title">
+              Calcula el ahorro total de tu flota al instante
+            </h1>
+            <p className="text-white/95 text-[13.5px] sm:text-base font-semibold mb-1 leading-snug">
+              Subsidio Estatal de Combustible | D.U. N.° 004-2026.
+            </p>
+            <p className="text-white/80 text-xs sm:text-[13.5px] leading-relaxed">
+              Descubre la calificación de tu flota y cuánto te corresponde en la devolución
+            </p>
+          </div>
+        </div>
       </div>
     </header>
   );
