@@ -15,6 +15,11 @@ import {
   Loader2,
   Timer,
   AlertTriangle,
+  ArrowDown,
+  FileText,
+  CloudUpload,
+  Building2,
+  ShieldCheck,
 } from "lucide-react";
 import {
   ELIGIBILITY_QUESTIONS,
@@ -456,134 +461,246 @@ const Stage1 = ({ precioDiesel, setPrecioDiesel, vehicles, setVehicles, onBack, 
 };
 
 // ---------- Stage 2: Result ----------
-const Stage2 = ({ result, precioDiesel, vehicles, onBack, onEmpezarRegistro, submitting }) => {
+const Stage2 = ({ result, precioDiesel, vehicles, onBack, onEmpezarRegistro, submitting, timeLeft }) => {
   if (!result) return null;
   const { totalSubsidy, totalGallonsRecognized, totalExpense, coverage, details } = result;
 
+  const scrollRef = React.useRef(null);
+  const [showScrollArrow, setShowScrollArrow] = useState(true);
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+    // Hide arrow if within 25px of the bottom
+    if (scrollHeight - scrollTop - clientHeight < 25) {
+      setShowScrollArrow(false);
+    } else {
+      setShowScrollArrow(true);
+    }
+  };
+
+  const scrollToBottom = () => {
+    if (!scrollRef.current) return;
+    scrollRef.current.scrollTo({
+      top: scrollRef.current.scrollHeight,
+      behavior: "smooth"
+    });
+  };
+
+  useEffect(() => {
+    // Run initial check
+    handleScroll();
+    // Re-check scroll on resize
+    window.addEventListener("resize", handleScroll);
+    return () => window.removeEventListener("resize", handleScroll);
+  }, [result]);
+
+  const formatGalonesInt = (n) =>
+    Number(n || 0).toLocaleString("es-PE", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
   return (
-    <section className="px-6 sm:px-10 py-7 animate-slide-in" data-testid="stage-result">
-      <div className="text-xs font-bold tracking-wider uppercase text-brand mb-1.5">Paso 3 de 3 · Tu estimado</div>
-      <h2 className="text-[22px] sm:text-2xl font-extrabold font-cabinet text-neutral-900 mb-1.5">Tu devolución estimada</h2>
-      <p className="text-sm text-neutral-500 mb-6">
-        Estimado referencial por los dos meses del decreto, con topes aplicados.
-      </p>
-
-      <div className="bg-white rounded-2xl border-[1.5px] border-neutral-200 px-6 py-7 text-center mb-5 shadow-[0_8px_30px_rgba(128,57,244,0.08)]">
-        <div className="text-[12.5px] font-bold tracking-wider uppercase text-brand mb-3.5">
-          Devolución total estimada (2 meses)
-        </div>
-        <div className="flex items-end justify-center">
-          <div className="flex flex-col items-center px-4">
-            <span className="text-4xl sm:text-5xl font-extrabold font-cabinet text-brand leading-none tracking-tight" data-testid="total-subsidy">
-              {formatSolesInt(totalSubsidy)}
-            </span>
-            <span className="text-[11px] text-neutral-500 mt-2 font-semibold uppercase tracking-wider">Subsidio</span>
+    <section className="px-6 sm:px-10 py-7 animate-slide-in relative" data-testid="stage-result">
+      {/* Paso Header con Botón de Ajustar Datos */}
+      <div className="flex items-center justify-between mb-4 pb-2 border-b border-neutral-100">
+        <div>
+          <div className="text-xs font-bold tracking-wider uppercase text-brand mb-1">
+            Paso 3 de 3 · Tu devolución
           </div>
-          <div className="w-px h-12 bg-neutral-200 mx-1 mb-3" />
-          <div className="flex flex-col items-center px-4 opacity-60">
-            <span className="text-2xl sm:text-3xl font-bold font-cabinet text-neutral-400 leading-none tracking-tight">
-              {formatSolesInt(totalExpense)}
-            </span>
-            <span className="text-[11px] text-neutral-400 mt-2 font-semibold uppercase tracking-wider">Tu gasto est.</span>
-          </div>
+          <h2 className="text-lg sm:text-xl font-extrabold font-cabinet text-neutral-900">
+            Tu devolución estimada
+          </h2>
         </div>
-        <div className="text-[13px] text-neutral-500 mt-4" data-testid="total-gallons">
-          {formatGalones(totalGallonsRecognized)} galones reconocidos · {MESES} meses
-        </div>
-        {totalExpense > 0 && (
-          <div className="mt-3 inline-block bg-brand-50 text-brand-700 text-[12.5px] rounded-xl px-3.5 py-2.5 leading-relaxed">
-            El subsidio cubre aproximadamente <strong className="text-brand">{coverage.toFixed(1)}%</strong> de tu gasto estimado de diésel.
-          </div>
-        )}
-      </div>
-
-      <div className="bg-white border-[1.5px] border-neutral-200 rounded-2xl overflow-hidden mb-5" data-testid="breakdown">
-        <div className="flex justify-between px-5 py-3.5 text-sm border-b border-neutral-100">
-          <span className="text-neutral-500">Subsidio por galón</span>
-          <span className="font-semibold text-neutral-800">{formatSoles(SUBSIDIO_GL)}</span>
-        </div>
-        <div className="flex justify-between px-5 py-3.5 text-sm border-b border-neutral-100">
-          <span className="text-neutral-500">Galones reconocidos (2 meses)</span>
-          <span className="font-semibold text-neutral-800">{formatGalones(totalGallonsRecognized)} gl</span>
-        </div>
-        <div className="flex justify-between px-5 py-3.5 text-sm border-b border-neutral-100">
-          <span className="text-neutral-500">Precio diésel referencia</span>
-          <span className="font-semibold text-neutral-800">{formatSoles(precioDiesel)} / gl</span>
-        </div>
-        <div className="flex justify-between px-5 py-4 text-sm bg-brand-50">
-          <span className="text-brand-700 font-bold">Devolución estimada</span>
-          <span className="text-brand font-extrabold text-base">{formatSoles(totalSubsidy)}</span>
-        </div>
-      </div>
-
-      <div className="bg-white border-[1.5px] border-neutral-200 rounded-2xl px-5 py-4 mb-5">
-        <h4 className="text-[12.5px] font-extrabold uppercase tracking-wider text-brand mb-3">Detalle por categoría</h4>
-        <div className="flex flex-col">
-          {details.map((d, i) => (
-            <div
-              key={i}
-              className="flex flex-col sm:flex-row sm:justify-between gap-1 py-2.5 text-[13.5px] border-b border-neutral-100 last:border-b-0"
-              data-testid={`detail-row-${i}`}
-            >
-              <div className="text-neutral-700">
-                <span className="font-semibold">{d.categoryId}</span> · {d.categoryLabel}
-                <span className="text-neutral-500"> · {d.unidades} unid. × {d.consumo} gl/mes</span>
-                {d.capped && (
-                  <span className="ml-2 text-amber-600 text-[11.5px] font-semibold">⚠ tope aplicado</span>
-                )}
-              </div>
-              <div className="font-semibold text-neutral-900 sm:text-right">
-                {formatSoles(d.subsidyGrupo)}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="border-l-4 border-amber-400 bg-amber-50 rounded-r-xl p-4 text-sm text-neutral-800 mb-6">
-        <Info className="inline-block mr-1.5 -mt-0.5" size={15} />{" "}
-        <strong className="text-amber-700">Esto es un estimado.</strong> El monto final depende de tus comprobantes electrónicos reales, que el proveedor tenga Registro Osinergmin vigente, y que tus títulos habilitantes estén en los sistemas de la ATU. Enered valida todo antes de presentar.
-      </div>
-
-      <div className="bg-gradient-to-br from-brand-50 to-brand-100 border-[1.5px] border-brand-100 rounded-2xl p-6 text-center">
-        <Sparkles className="mx-auto text-brand mb-2" size={26} />
-        <h3 className="text-[17px] font-extrabold font-cabinet text-brand-700 mb-2">¿Listo para recuperar este monto?</h3>
-        <p className="text-[13.5px] text-neutral-600 mb-4">
-          Sube tus documentos a nuestra plataforma y nosotros gestionamos toda la solicitud ante la ATU por ti.
-        </p>
-        <button
-          type="button"
-          onClick={onEmpezarRegistro}
-          disabled={submitting}
-          data-testid="start-registration-btn"
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand to-brand-500 px-6 py-3.5 text-sm font-bold text-white shadow-[0_4px_16px_rgba(128,57,244,0.25)] hover:shadow-[0_6px_22px_rgba(128,57,244,0.35)] hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-        >
-          {submitting ? (
-            <>
-              <Loader2 size={16} className="animate-spin" /> Guardando...
-            </>
-          ) : (
-            <>
-              <Rocket size={16} /> Empezar mi registro
-            </>
-          )}
-        </button>
-      </div>
-
-      <div className="flex justify-between gap-3 mt-5">
         <button
           type="button"
           onClick={onBack}
           data-testid="adjust-data-btn"
-          className="inline-flex items-center gap-2 rounded-xl border-[1.5px] border-neutral-300 bg-white px-5 py-3 text-sm font-bold text-neutral-700 hover:bg-neutral-50 transition-all"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-500 hover:text-brand hover:bg-neutral-50 rounded-lg px-2.5 py-1.5 border border-neutral-200 transition-all active:scale-95"
         >
-          <ArrowLeft size={16} /> Ajustar datos
+          <ArrowLeft size={13} /> Ajustar datos
         </button>
       </div>
 
-      <p className="text-[11.5px] text-neutral-500 text-center mt-5 leading-relaxed">
-        Enered · Cálculo basado en el DU 004-2026. El subsidio se otorga por adquisiciones de combustible del 29 mayo al 28 julio 2026. Solicitud única ante la ATU vía mesa de partes virtual.
-      </p>
+      <div className="relative">
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="max-h-[600px] overflow-y-auto pr-1.5 scroll-smooth"
+        >
+          {/* Fila 1: Dos Tarjetas Superiores */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+            {/* Tarjeta Izquierda - Estado te devuelve */}
+            <div className="bg-white border-[1.5px] border-neutral-200 rounded-2xl p-5 shadow-[0_4px_20px_rgba(128,57,244,0.04)] flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-brand block mb-1">
+                  El estado te devuelve
+                </span>
+                <span className="text-3xl sm:text-4xl font-extrabold font-cabinet text-brand block leading-none mb-2" data-testid="total-subsidy">
+                  {formatSolesInt(totalSubsidy)}
+                </span>
+                <span className="text-[11.5px] text-neutral-500 block">
+                  en {MESES} meses · {formatGalones(totalGallonsRecognized)} galones reconocidos
+                </span>
+              </div>
+              <div className="mt-4">
+                <span className="inline-flex items-center bg-brand-50 text-brand text-[11.5px] font-bold rounded-xl px-3 py-1.5">
+                  Cubre {coverage.toFixed(1)}% de tu gasto ({formatSolesInt(totalExpense)})
+                </span>
+              </div>
+            </div>
+
+            {/* Tarjeta Derecha - Alerta Cierre */}
+            <div className="bg-red-50/40 border-[1.5px] border-red-100 rounded-2xl p-5 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-red-600 block mb-1 flex items-center gap-1">
+                  ⚠️ Si no presentas tu expediente
+                </span>
+                <span className="text-3xl sm:text-4xl font-extrabold font-cabinet text-red-600 block leading-none mb-2">
+                  S/ 0
+                </span>
+                <span className="text-[11.5px] text-red-700/80 block leading-relaxed">
+                  El subsidio no se renueva. Lo que no presentes antes del cierre, se pierde.
+                </span>
+              </div>
+              <div className="mt-4">
+                <div className="bg-[#fff0f2] border border-red-100 rounded-xl px-3 py-2 text-center">
+                  <span className="text-[9px] uppercase font-bold text-red-500 block mb-0.5 tracking-wider">Cierra en</span>
+                  <span className="text-red-600 font-extrabold text-xs sm:text-[13px] tracking-wide">
+                    {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Fila 2: Tabla de desglose y Detalle por categoría */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+            {/* Tabla de desglose */}
+            <div className="bg-white border-[1.5px] border-neutral-200 rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.02)]" data-testid="breakdown">
+              <div className="flex justify-between px-4 py-3 text-xs sm:text-[13px] border-b border-neutral-100">
+                <span className="text-neutral-500">Subsidio por galón</span>
+                <span className="font-semibold text-neutral-800">{formatSoles(SUBSIDIO_GL)}</span>
+              </div>
+              <div className="flex justify-between px-4 py-3 text-xs sm:text-[13px] border-b border-neutral-100">
+                <span className="text-neutral-500">Galones reconocidos (2m)</span>
+                <span className="font-semibold text-neutral-800">{formatGalones(totalGallonsRecognized)} gl</span>
+              </div>
+              <div className="flex justify-between px-4 py-3 text-xs sm:text-[13px] border-b border-neutral-100">
+                <span className="text-neutral-500">Precio diésel ref.</span>
+                <span className="font-semibold text-neutral-800">{formatSoles(precioDiesel)} /gl</span>
+              </div>
+              <div className="flex justify-between px-4 py-3.5 text-xs sm:text-[13px] bg-brand-50 border-t border-brand-100">
+                <span className="text-brand font-bold">Devolución estimada</span>
+                <span className="text-brand font-extrabold">{formatSoles(totalSubsidy)}</span>
+              </div>
+            </div>
+
+            {/* Detalle por categoría */}
+            <div className="bg-white border-[1.5px] border-neutral-200 rounded-2xl p-4 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+              <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-brand mb-3">
+                Detalle por categoría
+              </h4>
+              <div className="flex flex-col gap-3">
+                {details.map((d, i) => {
+                  const label = `${d.categoryId} - ${d.categoryLabel.replace(/\s*\/\s*/g, '/')} · ${d.unidades}u × ${d.consumo}gl/m`;
+                  const consumoTotal = d.consumoPeriodoUnidad;
+                  const descText = d.capped
+                    ? `Tope ${d.categoryId}: ${formatGalonesInt(d.tope)} gl/unidad (2m). Tu consumo (${formatGalonesInt(consumoTotal)} gl) supera el tope — se aplica el límite.`
+                    : `Tope ${d.categoryId}: ${formatGalonesInt(d.tope)} gl/unidad (2m). Tu consumo (${formatGalonesInt(consumoTotal)} gl) está dentro del tope — se reconoce completo.`;
+
+                  return (
+                    <div key={i} className="flex flex-col gap-0.5 pb-2.5 last:pb-0 border-b border-neutral-100 last:border-b-0 text-[12.5px]" data-testid={`detail-row-${i}`}>
+                      <div className="flex justify-between items-start gap-1">
+                        <span className="font-semibold text-neutral-700">{label}</span>
+                        <span className="font-bold text-neutral-900 whitespace-nowrap">{formatSoles(d.subsidyGrupo)}</span>
+                      </div>
+                      <p className="text-[11px] text-neutral-500 leading-normal">
+                        {descText}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Banner inferior de Recuperación (CTA) */}
+          <div className="bg-gradient-to-br from-[#4f20dc] to-[#7134f5] border-[1.5px] border-[#4a18d1] rounded-2xl p-5 sm:p-6 text-white shadow-xl">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5">
+              <div className="max-w-[420px]">
+                <h3 className="text-lg sm:text-xl font-extrabold font-cabinet mb-1 text-white leading-tight">
+                  Recupera tus {formatSolesInt(totalSubsidy)}
+                </h3>
+                <p className="text-white/80 text-[12px] sm:text-[12.5px] leading-relaxed">
+                  Crea tu cuenta e inicia tu <strong>expediente ENERED</strong>. Subes tus comprobantes y nosotros gestionamos toda la solicitud ante la ATU por ti.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={onEmpezarRegistro}
+                disabled={submitting}
+                data-testid="start-registration-btn"
+                className="bg-white hover:bg-neutral-50 active:scale-95 text-brand font-bold text-xs sm:text-sm rounded-xl px-5 py-3.5 shadow-lg flex items-center justify-center gap-2 transition-all flex-shrink-0 disabled:opacity-75 disabled:cursor-not-allowed"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 size={15} className="animate-spin text-brand" /> Guardando...
+                  </>
+                ) : (
+                  <>
+                    <Rocket size={15} className="text-[#ff4a80] fill-[#ff4a80] animate-bounce" /> Recuperar mi devolución
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* 3 Tarjetas Informativas */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="bg-white/10 border border-white/5 rounded-xl p-3 flex items-center gap-3">
+                <FileText className="text-white/80 w-5 h-5 flex-shrink-0" />
+                <div>
+                  <div className="text-[11.5px] font-bold">1 · Te registras</div>
+                  <div className="text-[9.5px] text-white/60 font-medium">30 segundos</div>
+                </div>
+              </div>
+              <div className="bg-white/10 border border-white/5 rounded-xl p-3 flex items-center gap-3">
+                <CloudUpload className="text-white/80 w-5 h-5 flex-shrink-0" />
+                <div>
+                  <div className="text-[11.5px] font-bold">2 · Subes comprobantes</div>
+                  <div className="text-[9.5px] text-white/60 font-medium">B5/B20 electrónicos</div>
+                </div>
+              </div>
+              <div className="bg-white/10 border border-white/5 rounded-xl p-3 flex items-center gap-3">
+                <Building2 className="text-white/80 w-5 h-5 flex-shrink-0" />
+                <div>
+                  <div className="text-[11.5px] font-bold">3 · ENERED presenta</div>
+                  <div className="text-[9.5px] text-white/60 font-medium">Solicitud ante la ATU</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Nota con Escudo de Seguridad */}
+          <div className="mt-4 flex items-center gap-2 text-neutral-500 text-[11px] sm:text-[11.5px] leading-snug px-1.5 pb-2">
+            <ShieldCheck size={14} className="text-brand flex-shrink-0" />
+            <span>
+              Estimado referencial. ENERED valida tus comprobantes y títulos habilitantes antes de presentar.
+            </span>
+          </div>
+        </div>
+
+        {/* Botón Flotante para Desplazamiento */}
+        {showScrollArrow && (
+          <button
+            type="button"
+            onClick={scrollToBottom}
+            className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full border border-neutral-700 text-white flex items-center justify-center shadow-lg active:scale-95 transition-all z-20 animate-bounce"
+            aria-label="Ver más contenido"
+            style={{ backgroundColor: '#2e2e2e' }}
+          >
+            <ArrowDown size={14} />
+          </button>
+        )}
+      </div>
     </section>
   );
 };
@@ -743,6 +860,7 @@ export default function Calculator() {
             onBack={() => setStage("stage1")}
             onEmpezarRegistro={handleEmpezarRegistro}
             submitting={submitting}
+            timeLeft={timeLeft}
           />
         )}
       </div>
