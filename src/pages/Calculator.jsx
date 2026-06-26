@@ -35,7 +35,7 @@ const Header = ({ timeLeft }) => {
     <header className="relative overflow-hidden bg-gradient-to-r from-brand-700 via-brand to-brand-500 px-6 sm:px-10 py-8 sm:py-10">
       <div className="absolute -top-24 -right-6 h-72 w-72 rounded-full bg-white/10 blur-2xl pointer-events-none" />
       <div className="relative mx-auto max-w-3xl">
-        <div className="flex items-center gap-4 flex-wrap mb-6">
+        <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
           <img
             src="/assets/enered-logo.png"
             alt="Enered"
@@ -44,29 +44,29 @@ const Header = ({ timeLeft }) => {
           />
           
           {/* TIMER */}
-          <div className="flex items-center gap-3 bg-black/20 border border-white/10 rounded-2xl px-4 py-2 text-white shadow-inner">
+          <div className="flex items-center gap-3.5 bg-black/25 border border-white/15 rounded-2xl px-5 sm:px-6 py-2.5 sm:py-3.5 text-white shadow-lg backdrop-blur-sm">
             <div className="flex items-center justify-center">
-              <Timer className="w-4 h-4 text-white/80 animate-pulse" />
+              <Timer className="w-5 h-5 sm:w-6 h-6 text-white/90 animate-pulse" />
             </div>
-            <div className="flex items-center gap-1.5 font-cabinet">
+            <div className="flex items-center gap-2 font-cabinet">
               <div className="flex flex-col items-center">
-                <span className="text-lg sm:text-xl font-bold tracking-tight leading-none min-w-[20px] text-center">{days}</span>
-                <span className="text-[8px] sm:text-[9px] font-bold text-white/60 tracking-wider mt-1">DÍAS</span>
+                <span className="text-xl sm:text-2xl font-bold tracking-tight leading-none min-w-[24px] text-center">{days}</span>
+                <span className="text-[8px] sm:text-[9px] font-bold text-white/60 tracking-wider mt-1.5">DÍAS</span>
               </div>
-              <span className="text-lg sm:text-xl font-bold leading-none -mt-3.5 text-white/60">:</span>
+              <span className="text-xl sm:text-2xl font-bold leading-none -mt-4 sm:-mt-5 text-white/40">:</span>
               <div className="flex flex-col items-center">
-                <span className="text-lg sm:text-xl font-bold tracking-tight leading-none min-w-[20px] text-center">{hours}</span>
-                <span className="text-[8px] sm:text-[9px] font-bold text-white/60 tracking-wider mt-1">HRS</span>
+                <span className="text-xl sm:text-2xl font-bold tracking-tight leading-none min-w-[24px] text-center">{hours}</span>
+                <span className="text-[8px] sm:text-[9px] font-bold text-white/60 tracking-wider mt-1.5">HRS</span>
               </div>
-              <span className="text-lg sm:text-xl font-bold leading-none -mt-3.5 text-white/60">:</span>
+              <span className="text-xl sm:text-2xl font-bold leading-none -mt-4 sm:-mt-5 text-white/40">:</span>
               <div className="flex flex-col items-center">
-                <span className="text-lg sm:text-xl font-bold tracking-tight leading-none min-w-[20px] text-center">{minutes}</span>
-                <span className="text-[8px] sm:text-[9px] font-bold text-white/60 tracking-wider mt-1">MIN</span>
+                <span className="text-xl sm:text-2xl font-bold tracking-tight leading-none min-w-[24px] text-center">{minutes}</span>
+                <span className="text-[8px] sm:text-[9px] font-bold text-white/60 tracking-wider mt-1.5">MIN</span>
               </div>
-              <span className="text-lg sm:text-xl font-bold leading-none -mt-3.5 text-white/60">:</span>
+              <span className="text-xl sm:text-2xl font-bold leading-none -mt-4 sm:-mt-5 text-white/40">:</span>
               <div className="flex flex-col items-center">
-                <span className="text-lg sm:text-xl font-bold tracking-tight leading-none min-w-[20px] text-center">{seconds}</span>
-                <span className="text-[8px] sm:text-[9px] font-bold text-white/60 tracking-wider mt-1">SEG</span>
+                <span className="text-xl sm:text-2xl font-bold tracking-tight leading-none min-w-[24px] text-center">{seconds}</span>
+                <span className="text-[8px] sm:text-[9px] font-bold text-white/60 tracking-wider mt-1.5">SEG</span>
               </div>
             </div>
           </div>
