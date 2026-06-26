@@ -35,18 +35,13 @@ const Header = ({ timeLeft }) => {
     <header className="relative overflow-hidden bg-gradient-to-r from-brand-700 via-brand to-brand-500 px-6 sm:px-10 py-8 sm:py-10">
       <div className="absolute -top-24 -right-6 h-72 w-72 rounded-full bg-white/10 blur-2xl pointer-events-none" />
       <div className="relative mx-auto max-w-3xl">
-        <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
-          <div className="flex items-center gap-3">
-            <img
-              src="/assets/enered-logo.png"
-              alt="Enered"
-              className="h-8 sm:h-9 w-auto drop-shadow-[0_2px_8px_rgba(0,0,0,0.25)]"
-              data-testid="brand-logo"
-            />
-            <span className="text-white/60 text-[11px] sm:text-xs font-semibold pl-3 border-l border-white/20 uppercase tracking-wider">
-              Soluciones Integrales para Flotas
-            </span>
-          </div>
+        <div className="flex items-center gap-4 flex-wrap mb-6">
+          <img
+            src="/assets/enered-logo.png"
+            alt="Enered"
+            className="h-8 sm:h-9 w-auto drop-shadow-[0_2px_8px_rgba(0,0,0,0.25)]"
+            data-testid="brand-logo"
+          />
           
           {/* TIMER */}
           <div className="flex items-center gap-3 bg-black/20 border border-white/10 rounded-2xl px-4 py-2 text-white shadow-inner">
@@ -700,7 +695,7 @@ export default function Calculator() {
         <div className="bg-red-50/80 border-b border-red-100 py-3 px-4 text-center text-xs sm:text-sm text-red-800 flex items-center justify-center gap-2">
           <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
           <span>
-            El subsidio <strong className="font-bold">no se renueva</strong>. Cierra el <strong className="font-bold">28 de julio</strong> · quedan <strong className="font-bold text-red-600">{timeLeft.totalDays}</strong> días para presentar tu expediente.
+            El subsidio <strong className="font-bold">no se renueva</strong>. Cierra el <strong className="font-bold">28 de julio</strong> · quedan <strong className="font-bold text-red-600">{Number(timeLeft.days)}</strong> días para presentar tu expediente.
           </span>
         </div>
 
