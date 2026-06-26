@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import axios from "axios";
 import {
   ArrowRight,
@@ -13,6 +13,8 @@ import {
   Info,
   Rocket,
   Loader2,
+  Timer,
+  AlertTriangle,
 } from "lucide-react";
 import {
   ELIGIBILITY_QUESTIONS,
@@ -27,27 +29,64 @@ import {
 } from "../lib/calculatorData";
 
 // ---------- Header ----------
-const Header = () => (
-  <header className="relative overflow-hidden bg-gradient-to-r from-brand-700 via-brand to-brand-500 px-6 sm:px-10 py-8 sm:py-10">
-    <div className="absolute -top-24 -right-6 h-72 w-72 rounded-full bg-white/10 blur-2xl pointer-events-none" />
-    <div className="relative mx-auto max-w-3xl">
-      <div className="flex items-center gap-3 mb-4">
-        <img
-          src="/assets/enered-logo.png"
-          alt="Enered"
-          className="h-9 sm:h-10 w-auto drop-shadow-[0_2px_8px_rgba(0,0,0,0.25)]"
-          data-testid="brand-logo"
-        />
+const Header = ({ timeLeft }) => {
+  const { days, hours, minutes, seconds } = timeLeft;
+  return (
+    <header className="relative overflow-hidden bg-gradient-to-r from-brand-700 via-brand to-brand-500 px-6 sm:px-10 py-8 sm:py-10">
+      <div className="absolute -top-24 -right-6 h-72 w-72 rounded-full bg-white/10 blur-2xl pointer-events-none" />
+      <div className="relative mx-auto max-w-3xl">
+        <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
+          <div className="flex items-center gap-3">
+            <img
+              src="/assets/enered-logo.png"
+              alt="Enered"
+              className="h-8 sm:h-9 w-auto drop-shadow-[0_2px_8px_rgba(0,0,0,0.25)]"
+              data-testid="brand-logo"
+            />
+            <span className="text-white/60 text-[11px] sm:text-xs font-semibold pl-3 border-l border-white/20 uppercase tracking-wider">
+              Soluciones Integrales para Flotas
+            </span>
+          </div>
+          
+          {/* TIMER */}
+          <div className="flex items-center gap-3 bg-black/20 border border-white/10 rounded-2xl px-4 py-2 text-white shadow-inner">
+            <div className="flex items-center justify-center">
+              <Timer className="w-4 h-4 text-white/80 animate-pulse" />
+            </div>
+            <div className="flex items-center gap-1.5 font-cabinet">
+              <div className="flex flex-col items-center">
+                <span className="text-lg sm:text-xl font-bold tracking-tight leading-none min-w-[20px] text-center">{days}</span>
+                <span className="text-[8px] sm:text-[9px] font-bold text-white/60 tracking-wider mt-1">DÍAS</span>
+              </div>
+              <span className="text-lg sm:text-xl font-bold leading-none -mt-3.5 text-white/60">:</span>
+              <div className="flex flex-col items-center">
+                <span className="text-lg sm:text-xl font-bold tracking-tight leading-none min-w-[20px] text-center">{hours}</span>
+                <span className="text-[8px] sm:text-[9px] font-bold text-white/60 tracking-wider mt-1">HRS</span>
+              </div>
+              <span className="text-lg sm:text-xl font-bold leading-none -mt-3.5 text-white/60">:</span>
+              <div className="flex flex-col items-center">
+                <span className="text-lg sm:text-xl font-bold tracking-tight leading-none min-w-[20px] text-center">{minutes}</span>
+                <span className="text-[8px] sm:text-[9px] font-bold text-white/60 tracking-wider mt-1">MIN</span>
+              </div>
+              <span className="text-lg sm:text-xl font-bold leading-none -mt-3.5 text-white/60">:</span>
+              <div className="flex flex-col items-center">
+                <span className="text-lg sm:text-xl font-bold tracking-tight leading-none min-w-[20px] text-center">{seconds}</span>
+                <span className="text-[8px] sm:text-[9px] font-bold text-white/60 tracking-wider mt-1">SEG</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <h1 className="text-white font-extrabold font-cabinet text-2xl sm:text-3xl mb-2 leading-tight" data-testid="hero-title">
+          Calculadora de devolución · DU 004-2026
+        </h1>
+        <p className="text-white/85 text-sm sm:text-base max-w-xl">
+          Estima cuánto te devuelve el Estado por el diésel B5/B20 que consume tu flota – <strong className="font-extrabold text-white">antes de que cierre la ventana.</strong>
+        </p>
       </div>
-      <h1 className="text-white font-extrabold font-cabinet text-2xl sm:text-3xl mb-2 leading-tight" data-testid="hero-title">
-        Calculadora de devolución · DU 004-2026
-      </h1>
-      <p className="text-white/85 text-sm sm:text-base max-w-xl">
-        Estima cuánto puedes recuperar del subsidio del Estado por el diésel B5/B20 que consume tu flota.
-      </p>
-    </div>
-  </header>
-);
+    </header>
+  );
+};
 
 // ---------- Progress ----------
 const Progress = ({ stage }) => {
@@ -553,6 +592,62 @@ export default function Calculator() {
   const [precioDiesel, setPrecioDiesel] = useState("16.50");
   const [vehicles, setVehicles] = useState([{ categoryId: "M2", consumo: "", unidades: "" }]);
 
+  // countdown state
+  const [timeLeft, setTimeLeft] = useState(() => {
+    const calculateTimeLeft = () => {
+      const targetDate = new Date("2026-07-28T23:59:59");
+      const difference = targetDate - new Date();
+      if (difference <= 0) {
+        return { days: "00", hours: "00", minutes: "00", seconds: "00", totalDays: 0 };
+      }
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((difference / 1000 / 60) % 60);
+      const seconds = Math.floor((difference / 1000) % 60);
+      const totalDays = Math.ceil(difference / (1000 * 60 * 60 * 24));
+      
+      const pad = (num) => String(num).padStart(2, "0");
+      return {
+        days: pad(days),
+        hours: pad(hours),
+        minutes: pad(minutes),
+        seconds: pad(seconds),
+        totalDays
+      };
+    };
+    return calculateTimeLeft();
+  });
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const targetDate = new Date("2026-07-28T23:59:59");
+      const difference = targetDate - new Date();
+      if (difference <= 0) {
+        return { days: "00", hours: "00", minutes: "00", seconds: "00", totalDays: 0 };
+      }
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((difference / 1000 / 60) % 60);
+      const seconds = Math.floor((difference / 1000) % 60);
+      const totalDays = Math.ceil(difference / (1000 * 60 * 60 * 24));
+      
+      const pad = (num) => String(num).padStart(2, "0");
+      return {
+        days: pad(days),
+        hours: pad(hours),
+        minutes: pad(minutes),
+        seconds: pad(seconds),
+        totalDays
+      };
+    };
+
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   const result = useMemo(() => {
     if (stage !== "stage2") return null;
     return calculateSubsidy(vehicles, Number(precioDiesel) || 0);
@@ -599,7 +694,16 @@ export default function Calculator() {
   return (
     <div className="min-h-screen bg-[#F7F6FB] py-6 sm:py-10">
       <div className="mx-auto max-w-[760px] bg-white rounded-3xl shadow-[0_20px_60px_-20px_rgba(128,57,244,0.18)] overflow-hidden border border-neutral-100">
-        <Header />
+        <Header timeLeft={timeLeft} />
+        
+        {/* Banner de Advertencia */}
+        <div className="bg-red-50/80 border-b border-red-100 py-3 px-4 text-center text-xs sm:text-sm text-red-800 flex items-center justify-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
+          <span>
+            El subsidio <strong className="font-bold">no se renueva</strong>. Cierra el <strong className="font-bold">28 de julio</strong> · quedan <strong className="font-bold text-red-600">{timeLeft.totalDays}</strong> días para presentar tu expediente.
+          </span>
+        </div>
+
         <Progress stage={stage} />
 
         {stage === "stage0" && (
