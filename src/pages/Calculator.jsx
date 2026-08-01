@@ -773,7 +773,7 @@ export default function Calculator() {
         <div className="bg-red-50/80 border-b border-red-100 py-3 px-4 text-center text-xs sm:text-sm text-red-800 flex items-center justify-center gap-2">
           <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
           <span>
-            ⚠️ El periodo de consumo del Subsidio de combustible, ha finalizado el <strong className="font-bold">28 de julio</strong>. Tienes hasta el <strong className="font-bold">28 de septiembre</strong> para presentar tu expediente, quedan <strong className="font-bold text-red-600">{Number(timeLeft.days)}</strong> días.
+            El periodo de consumo del Subsidio de combustible, ha finalizado el <strong className="font-bold">28 de julio</strong>. Tienes hasta el <strong className="font-bold">28 de septiembre</strong> para presentar tu expediente, quedan <strong className="font-bold text-red-600">{Number(timeLeft.days)}</strong> días.
           </span>
         </div>
 
